@@ -1,12 +1,13 @@
+import { CarTool } from './components/CarTool';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const carList = [
+  { id: 1, make: 'Ford', model: 'Fusion Hybrid', year: 2018, color: 'silver', price: 30000 },
+  { id: 2, make: 'Tesla', model: 'S', year: 2017, color: 'red', price: 120000 }
+];
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+ReactDOM.render(
+  <CarTool cars={carList} />,
+  document.querySelector('#root')
+);
