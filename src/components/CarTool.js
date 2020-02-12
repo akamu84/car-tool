@@ -1,57 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export const CarTool = ({ cars }) => {
+import { carsPropType } from '../propTypes/cars';
+
+import { ToolHeader } from './ToolHeader';
+import { CarTable } from './CarTable';
+import { CarForm } from './CarForm';
+
+export const CarTool = ({ cars: initialCars }) => {
+  const [cars, setCars] = useState(initialCars.concat());
+
+  const addCar = car => {
+    setCars(cars.concat({ ...car, id: Math.max(...cars.map(c => c.id)) + 1 }));
+  };
+
   return (
     <>
-      <header>
-        <h1>Car Tool</h1>
-      </header>
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Make</th>
-            <th>Model</th>
-            <th>Year</th>
-            <th>Color</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cars.map(car =>
-            <tr key={car.id}>
-              <td>{car.id}</td>
-              <td>{car.make}</td>
-              <td>{car.model}</td>
-              <td>{car.year}</td>
-              <td>{car.color}</td>
-              <td>{car.price}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-      <form>
-        <div>
-          <label htmlFor="make-input">Make:</label>
-          <input type="text" id="make-input"/>
-        </div>
-        <div>
-          <label htmlFor="model-input">Model:</label>
-          <input type="text" id="model-input"/>
-        </div>
-        <div>
-          <label htmlFor="year-input">Year:</label>
-          <input type="text" id="year-input"/>
-        </div>
-        <div>
-          <label htmlFor="color-input">Color:</label>
-          <input type="text" id="color-input"/>
-        </div>
-        <div>
-          <label htmlFor="price-input">Price:</label>
-          <input type="text" id="price-input"/>
-        </div>
-      </form>
+      <ToolHeader headerText="Car Tool" />
+      <CarTable cars={cars} />
+      <CarForm onSubmitCar={addCar} buttonText="Add Car" />
     </>
   );
-}
+};
+
+CarTool.propTypes = {
+  cars: carsPropType,
+};
