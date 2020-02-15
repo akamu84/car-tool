@@ -1,14 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { useDefaultInputFocus } from '../hooks/useDefaultInputFocus';
-import { carsPropType } from '../propTypes/cars';
+import {
+  getAllCars as dbGetAllCars,
+  createCar as dbCreateCar,
+  replaceCar as dbReplaceCar,
+  deleteCar as dbDeleteCar,
+} from '../services/cars';
 
 import { ToolHeader } from './ToolHeader';
 import { CarTable } from './CarTable';
 import { CarForm } from './CarForm';
 
-export const CarTool = ({ cars: initialCars }) => {
-  const [cars, setCars] = useState(initialCars.concat());
+export const CarTool = () => {
+  const [cars, setCars] = useState([]);
   const [editCarId, setEditCarId] = useState(-1);
 
   const defaultInputRef = useDefaultInputFocus();
@@ -20,33 +25,38 @@ export const CarTool = ({ cars: initialCars }) => {
     }
   }, [defaultInputRef]);
 
+  const refreshCars = useCallback(
+    () =>
+      dbGetAllCars().then(allCars => {
+        setCars(allCars);
+        init();
+      }),
+    [init]
+  );
+
+  useEffect(() => {
+    refreshCars();
+  }, [refreshCars]);
+
   const addCar = useCallback(
     car => {
-      setCars(
-        cars.concat({ ...car, id: Math.max(...cars.map(c => c.id)) + 1 })
-      );
-      init();
+      dbCreateCar(car).then(refreshCars);
     },
-    [cars, init]
+    [refreshCars]
   );
 
   const deleteCar = useCallback(
     carId => {
-      setCars(cars.filter(car => car.id !== carId));
-      init();
+      dbDeleteCar(carId).then(refreshCars);
     },
-    [cars, init]
+    [refreshCars]
   );
 
   const replaceCar = useCallback(
     car => {
-      const newCars = cars.concat();
-      const carIndex = newCars.findIndex(c => c.id === car.id);
-      newCars[carIndex] = car;
-      setCars(newCars);
-      init();
+      dbReplaceCar(car).then(refreshCars);
     },
-    [cars, init]
+    [refreshCars]
   );
 
   const cancelCar = useCallback(() => {
@@ -71,8 +81,4 @@ export const CarTool = ({ cars: initialCars }) => {
       />
     </>
   );
-};
-
-CarTool.propTypes = {
-  cars: carsPropType,
 };
